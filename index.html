@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AROE BDT GAME FUTURE SIGNAL</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #000;
+            color: #00ff00;
+            text-align: center;
+            padding: 20px;
+        }
+        h1 {
+            color: yellow;
+            font-size: 24px;
+        }
+        .rules {
+            background: darkred;
+            padding: 10px;
+            margin-bottom: 15px;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        .signal-box {
+            background: black;
+            border: 2px solid limegreen;
+            width: 90%;
+            max-width: 400px;
+            height: 200px;
+            margin: auto;
+            overflow-y: auto;
+            text-align: left;
+            white-space: pre-wrap;
+            font-size: 14px;
+            padding: 10px;
+            color: cyan;
+        }
+        input, button {
+            font-family: monospace;
+            background: black;
+            border: 1px solid limegreen;
+            color: limegreen;
+            font-size: 15px;
+            padding: 10px;
+            text-align: center;
+            margin-top: 5px;
+            width: 80%;
+            max-width: 100px;
+        }
+        button {
+            cursor: pointer;
+        }
+        .result {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 10px;
+            color: yellow;
+        }
+        .big {
+            color: red;
+        }
+        .small {
+            color: cyan;
+        }
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: darkred;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            display: none;
+        }
+        .stats-box {
+            margin-top: 20px;
+            font-size: 14px;
+            background: #333;
+            padding: 15px;
+            border-radius: 10px;
+            color: limegreen;
+        }
+        .stats-box h3 {
+            color: yellow;
+            font-size: 18px;
+        }
+        .telegram-button {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #0088cc;
+            color: white;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            width: 80%;
+            max-width: 400px;
+        }
+        .telegram-button:hover {
+            background-color: #006fa6;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔮BDT GAME FUTURE SIGNAL🔮</h1>
+
+    <div class="rules">
+        ❗ ২৪ ঘণ্টায় ৫০ টার বেশি সিগন্যাল নেওয়া যাবে না, অন্যথায় IP ব্লক হবে। ২৪ ঘণ্টা পর আবার আনলক হবে।
+    </div>
+
+    <input type="number" id="codeInput" placeholder="(Max 50)" min="1" max="50">
+    <button onclick="startHacking()">Enter</button>
+
+    <div class="signal-box" id="signalBox">
+        Waiting for signals...
+    </div>
+
+    <div class="toast" id="toast">You have reached the daily limit!</div>
+
+    <div class="stats-box">
+        <h3>Current Stats:</h3>
+        <p>🧑‍🤝‍🧑 Online Users: <span id="onlineUsers">0</span></p>
+        <p>📈 Total Signals Today: <span id="totalSignals">0</span></p>
+    </div>
+
+    <button class="telegram-button" onclick="goToTelegramChannel()">Telegram Channel</button>
+
+    <script>
+        let onlineUsersCount = 0;
+        let totalSignalsGenerated = 0;
+
+        function getIP() {
+            return localStorage.getItem("user_ip") || Math.random().toString(36).substr(2, 10);
+        }
+
+        function getTodayDate() {
+            return new Date().toISOString().split('T')[0];
+        }
+
+        function isBlocked() {
+            return localStorage.getItem("blocked_date") === getTodayDate();
+        }
+
+        function blockUser() {
+            localStorage.setItem("blocked_date", getTodayDate());
+            showToast("❌ You have reached the daily limit!");
+            sendTelegramNotification();
+        }
+
+        function sendTelegramNotification() {
+            let telegramBotToken = "7704136281:AAFznINjK0HDRJzVwnw0YJF2BYj7meuOSvI"; // আপনার টেলিগ্রাম বট টোকেন
+            let chatId = "7228892640"; // টেলিগ্রাম চ্যানেলের আইডি
+            let message = `🚨 IP Blocked: ${getIP()} exceeded daily limit.`;
+
+            let url = `https://api.telegram.org/bot${telegramBotToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+            fetch(url);
+        }
+
+        function startHacking() {
+            if (isBlocked()) {
+                showToast("❌ You are blocked for today! Try again after 24 hours.");
+                return;
+            }
+
+            let userCode = document.getElementById("codeInput").value.trim();
+            let signalCount = parseInt(userCode);
+            let signalBox = document.getElementById("signalBox");
+
+            if (isNaN(signalCount) || signalCount <= 0 || signalCount > 50) {
+                signalBox.innerHTML = "❌ Invalid input! Enter a valid number between 1 and 50.";
+                return;
+            }
+
+            let storedCount = localStorage.getItem("signal_count") || 0;
+            storedCount = parseInt(storedCount);
+
+            if (storedCount + signalCount > 50) {
+                blockUser();
+                return;
+            }
+
+            localStorage.setItem("signal_count", storedCount + signalCount);
+            signalBox.innerHTML = "Generating Signals...";
+
+            totalSignalsGenerated += signalCount;
+            updateStats();
+
+            generateSignals(signalCount);
+        }
+
+        function generateSignals(count) {
+            let signalBox = document.getElementById("signalBox");
+            signalBox.innerHTML = "Generating signals...\n";
+
+            for (let i = 0; i < count; i++) {
+                let randomResult = generateRandomResult();
+                signalBox.innerHTML += `📡 SIGNAL ${i + 1}: ${randomResult}\n`;
+            }
+
+            signalBox.scrollTop = signalBox.scrollHeight;
+        }
+
+        function generateRandomResult() {
+            return Math.random() < 0.5 ? "BIG" : "SMALL";
+        }
+
+        function showToast(message) {
+            let toast = document.getElementById("toast");
+            toast.innerText = message;
+            toast.style.display = "block";
+            setTimeout(() => {
+                toast.style.display = "none";
+            }, 3000);
+        }
+
+        function updateStats() {
+            document.getElementById("onlineUsers").innerText = onlineUsersCount;
+            document.getElementById("totalSignals").innerText = totalSignalsGenerated;
+        }
+
+        // Update online users count every 5 seconds
+        setInterval(() => {
+            onlineUsersCount++;
+            updateStats();
+        }, 10000);
+
+        // Redirect to Telegram channel
+        function goToTelegramChannel() {
+            window.open("https://t.me/+RFF5wlUexkgwNzVl", "_blank");
+        }
+    </script>
+</body>
+</html>
